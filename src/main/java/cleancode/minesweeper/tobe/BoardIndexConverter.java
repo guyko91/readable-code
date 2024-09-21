@@ -5,13 +5,13 @@ public class BoardIndexConverter {
     private static final char BASE_CHAR_FOR_COL = 'a';
 
     public int getSelectedColIndex(String cellInput) {
-        String cellInputRow = cellInput.substring(1);
-        return convertRowFrom(cellInputRow);
+        char cellInputCol = cellInput.charAt(0);
+        return convertColFrom(cellInputCol);
     }
 
     public int getSelectedRowIndex(String cellInput) {
-        char cellInputCol = cellInput.charAt(0);
-        return convertColFrom(cellInputCol);
+        String cellInputRow = cellInput.substring(1);
+        return convertRowFrom(cellInputRow);
     }
 
     private int convertRowFrom(String cellInputRow) {
