@@ -2,18 +2,22 @@ package cleancode.minesweeper.tobe.io;
 
 import cleancode.minesweeper.tobe.GameBoard;
 import cleancode.minesweeper.tobe.GameException;
+import cleancode.minesweeper.tobe.cell.Cell;
 import cleancode.minesweeper.tobe.cell.CellSnapshot;
-import cleancode.minesweeper.tobe.cell.CellSnapshotStatus;
+import cleancode.minesweeper.tobe.io.sign.CellSignFinder;
+import cleancode.minesweeper.tobe.io.sign.CellSignProvider;
 import cleancode.minesweeper.tobe.position.CellPosition;
 import java.util.List;
 import java.util.stream.IntStream;
 
 public class ConsoleOutputHandler implements OutputHandler {
 
-    private static final String EMPTY_SIGN = "■";
-    private static final String LAND_MINE_SIGN = "☼";
-    private static final String FLAG_SIGN = "⚑";
-    private static final String UNCHECKED_SIGN = "□";
+    // CellSignProvider를 사용하기 전 CellSignFinder를 사용하던 코드
+//    private static final String EMPTY_SIGN = "■";
+//    private static final String LAND_MINE_SIGN = "☼";
+//    private static final String FLAG_SIGN = "⚑";
+//    private static final String UNCHECKED_SIGN = "□";
+//    private final CellSignFinder cellSignFinder = new CellSignFinder();
 
     @Override
     public void showGameStartComments() {
@@ -31,9 +35,11 @@ public class ConsoleOutputHandler implements OutputHandler {
             System.out.printf("%2d  ", row + 1);
             for (int col = 0; col < gameBoard.getColSize(); col++) {
                 CellPosition cellPosition = CellPosition.of(row, col);
-                CellSnapshot cellSnapshot = gameBoard.getSnapshot(cellPosition);
-                String cellSign = decideCellSignFromSnapshot(cellSnapshot);
 
+                CellSnapshot cellSnapshot = gameBoard.getSnapshot(cellPosition);
+//                String cellSign = cellSignFinder.findCellSignFromCellSnapshot(cellSnapshot);
+                String cellSign = CellSignProvider.findCellSignFrom(cellSnapshot);
+                
                 System.out.print(cellSign + " ");
             }
             System.out.println();
@@ -69,26 +75,6 @@ public class ConsoleOutputHandler implements OutputHandler {
     @Override
     public void showSimpleMessage(String s) {
         System.out.println(s);
-    }
-
-    private String decideCellSignFromSnapshot(CellSnapshot cellSnapshot) {
-        CellSnapshotStatus status = cellSnapshot.getStatus();
-        if (status == CellSnapshotStatus.EMPTY) {
-            return EMPTY_SIGN;
-        }
-        if (status == CellSnapshotStatus.LAND_MINE) {
-            return LAND_MINE_SIGN;
-        }
-        if (status == CellSnapshotStatus.FLAG) {
-            return FLAG_SIGN;
-        }
-        if (status == CellSnapshotStatus.NUMBER) {
-            return String.valueOf(cellSnapshot.getNearbyLandMineCount());
-        }
-        if (status == CellSnapshotStatus.UNCHECKED) {
-            return UNCHECKED_SIGN;
-        }
-        throw new IllegalArgumentException("확인할 수 없는 셀입니다.");
     }
 
     private String generateColAlphabets(GameBoard gameBoard) {
