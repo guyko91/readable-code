@@ -23,8 +23,12 @@ public class CellPosition {
     // 동등성 보장 (동일성 X)
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         CellPosition that = (CellPosition) o;
         return rowIndex == that.rowIndex && colIndex == that.colIndex;
     }

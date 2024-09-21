@@ -16,7 +16,8 @@ public class GameConfig {
         this.outputHandler = outputHandler;
     }
 
-    public static GameConfig of(GameLevel level, InputHandler inputHandler, OutputHandler outputHandler) {
+    public static GameConfig of(GameLevel level, InputHandler inputHandler,
+        OutputHandler outputHandler) {
         return new GameConfig(level, inputHandler, outputHandler);
     }
 

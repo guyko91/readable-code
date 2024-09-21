@@ -12,7 +12,7 @@ public class CellSnapshot {
         this.nearbyLandMineCount = nearbyLandMineCount;
     }
 
-    public static CellSnapshot of (CellSnapshotStatus status, int nearbyLandMineCount) {
+    public static CellSnapshot of(CellSnapshotStatus status, int nearbyLandMineCount) {
         return new CellSnapshot(status, nearbyLandMineCount);
     }
 

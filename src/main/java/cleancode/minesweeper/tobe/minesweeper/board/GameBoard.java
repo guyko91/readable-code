@@ -6,12 +6,13 @@ import cleancode.minesweeper.tobe.minesweeper.board.cell.Cells;
 import cleancode.minesweeper.tobe.minesweeper.board.cell.EmptyCell;
 import cleancode.minesweeper.tobe.minesweeper.board.cell.LandMineCell;
 import cleancode.minesweeper.tobe.minesweeper.board.cell.NumberCell;
-import cleancode.minesweeper.tobe.minesweeper.gamelevel.GameLevel;
 import cleancode.minesweeper.tobe.minesweeper.board.position.CellPosition;
 import cleancode.minesweeper.tobe.minesweeper.board.position.CellPositions;
 import cleancode.minesweeper.tobe.minesweeper.board.position.RelativePosition;
+import cleancode.minesweeper.tobe.minesweeper.gamelevel.GameLevel;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
-import java.util.Stack;
 
 public class GameBoard {
 
@@ -140,9 +141,9 @@ public class GameBoard {
     }
 
     /**
-     * stack 사용 전 메서드
-     * 원래는 CellPosition 이 아니라 int row, int col 로 받아서 사용했었다.
-     * 이를 객체 지향적으로 CellPosition 으로 변경하면서 Stack 을 사용한 방법도 가능하게 되었다.
+     * stack 사용 전 메서드 원래는 CellPosition 이 아니라 int row, int col 로 받아서 사용했었다. 이를 객체 지향적으로 CellPosition
+     * 으로 변경하면서 Stack 을 사용한 방법도 가능하게 되었다.
+     *
      * @param cellPosition
      */
     private void openSurroundedCellsBefore(CellPosition cellPosition) {
@@ -159,22 +160,23 @@ public class GameBoard {
             return;
         }
 
-        List<CellPosition> surroundedPositions = calculateSurroundedPositions(cellPosition, getRowSize(), getColSize());
+        List<CellPosition> surroundedPositions = calculateSurroundedPositions(cellPosition,
+            getRowSize(), getColSize());
         surroundedPositions.forEach(this::openSurroundedCellsBefore);
     }
 
     // stack 을 활용한 리팩토링
     private void openSurroundedCells(CellPosition cellPosition) {
-        Stack<CellPosition> stack = new Stack<>();
-        stack.push(cellPosition);
+        Deque<CellPosition> deque = new ArrayDeque<>();
+        deque.push(cellPosition);
 
-        while(!stack.isEmpty()) {
-            openAndPushCellAt(stack);
+        while (!deque.isEmpty()) {
+            openAndPushCellAt(deque);
         }
     }
 
-    private void openAndPushCellAt(Stack<CellPosition> stack) {
-        CellPosition currentCellPosition = stack.pop();
+    private void openAndPushCellAt(Deque<CellPosition> deque) {
+        CellPosition currentCellPosition = deque.pop();
         if (isOpenedCell(currentCellPosition)) {
             return;
         }
@@ -188,9 +190,10 @@ public class GameBoard {
             return;
         }
 
-        List<CellPosition> surroundedPositions = calculateSurroundedPositions(currentCellPosition, getRowSize(), getColSize());
+        List<CellPosition> surroundedPositions = calculateSurroundedPositions(currentCellPosition,
+            getRowSize(), getColSize());
         for (CellPosition surroundedPosition : surroundedPositions) {
-            stack.push(surroundedPosition);
+            deque.push(surroundedPosition);
         }
     }
 
@@ -226,19 +229,17 @@ public class GameBoard {
         int colSize = getColSize();
 
         long count1 = calculateSurroundedPositions(cellPosition, rowSize, colSize).stream()
-            .filter(this::isLandMineCellAt)
-            .count();
+            .filter(this::isLandMineCellAt).count();
 
         return (int) count1;
     }
 
-    private List<CellPosition> calculateSurroundedPositions(CellPosition cellPosition,
-        int rowSize, int colSize) {
+    private List<CellPosition> calculateSurroundedPositions(CellPosition cellPosition, int rowSize,
+        int colSize) {
         return RelativePosition.SURROUNDED_POSITIONS.stream()
             .filter(cellPosition::canCalculatePositionBy)
             .map(cellPosition::calculatePositionBy)
             .filter(position -> position.isRowIndexLessThan(rowSize))
-            .filter(position -> position.isColIndexLessThan(colSize))
-            .toList();
+            .filter(position -> position.isColIndexLessThan(colSize)).toList();
     }
 }
