@@ -11,6 +11,7 @@ import cleancode.minesweeper.tobe.minesweeper.board.position.CellPosition;
 import cleancode.minesweeper.tobe.minesweeper.board.position.CellPositions;
 import cleancode.minesweeper.tobe.minesweeper.board.position.RelativePosition;
 import java.util.List;
+import java.util.Stack;
 
 public class GameBoard {
 
@@ -138,7 +139,13 @@ public class GameBoard {
         gameStatus = GameStatus.WIN;
     }
 
-    private void openSurroundedCells(CellPosition cellPosition) {
+    /**
+     * stack 사용 전 메서드
+     * 원래는 CellPosition 이 아니라 int row, int col 로 받아서 사용했었다.
+     * 이를 객체 지향적으로 CellPosition 으로 변경하면서 Stack 을 사용한 방법도 가능하게 되었다.
+     * @param cellPosition
+     */
+    private void openSurroundedCellsBefore(CellPosition cellPosition) {
         if (isOpenedCell(cellPosition)) {
             return;
         }
@@ -153,7 +160,38 @@ public class GameBoard {
         }
 
         List<CellPosition> surroundedPositions = calculateSurroundedPositions(cellPosition, getRowSize(), getColSize());
-        surroundedPositions.forEach(this::openSurroundedCells);
+        surroundedPositions.forEach(this::openSurroundedCellsBefore);
+    }
+
+    // stack 을 활용한 리팩토링
+    private void openSurroundedCells(CellPosition cellPosition) {
+        Stack<CellPosition> stack = new Stack<>();
+        stack.push(cellPosition);
+
+        while(!stack.isEmpty()) {
+            openAndPushCellAt(stack);
+        }
+    }
+
+    private void openAndPushCellAt(Stack<CellPosition> stack) {
+        CellPosition currentCellPosition = stack.pop();
+        if (isOpenedCell(currentCellPosition)) {
+            return;
+        }
+        if (isLandMineCellAt(currentCellPosition)) {
+            return;
+        }
+
+        openOneCell(currentCellPosition);
+
+        if (doesCellHaveLandmineCount(currentCellPosition)) {
+            return;
+        }
+
+        List<CellPosition> surroundedPositions = calculateSurroundedPositions(currentCellPosition, getRowSize(), getColSize());
+        for (CellPosition surroundedPosition : surroundedPositions) {
+            stack.push(surroundedPosition);
+        }
     }
 
     private void checkIfGameIsOver() {
